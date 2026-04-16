@@ -145,14 +145,14 @@ const CityMap={
     const names=['Kerkstraat','Vijzelgracht','Prinsengracht','Spuistraat','Damrak','Overtoom','Bilderdijk','Ferdinand Bol'];
     for(const b of this.blocks){ctx.fillStyle=b.park?'#C8E6C9':`rgb(${210+b.shade*20},${210+b.shade*20},${215+b.shade*20})`;ctx.beginPath();ctx.roundRect(b.x,b.y,b.w,b.h,3);ctx.fill();}
     for(const s of this.streets){ctx.strokeStyle='#F5F5F5';ctx.lineWidth=s.horiz?7:6;ctx.beginPath();ctx.moveTo(s.x1,s.y1);ctx.lineTo(s.x2,s.y2);ctx.stroke();ctx.strokeStyle='#E0E0E0';ctx.lineWidth=.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(s.x1,s.y1);ctx.lineTo(s.x2,s.y2);ctx.stroke();ctx.setLineDash([]);}
-    ctx.font='7px Plus Jakarta Sans,sans-serif';ctx.fillStyle='#B0B0B0';
+    ctx.font='7px IBM Plex Sans,sans-serif';ctx.fillStyle='#B0B0B0';
     this.streets.forEach((s,i)=>{if(i%3||i>=names.length)return;if(s.horiz)ctx.fillText(names[i],10,s.y1-3);else{ctx.save();ctx.translate(s.x1+3,20);ctx.rotate(Math.PI/2);ctx.fillText(names[i],0,0);ctx.restore();}});
     if(this.route.length>1){ctx.strokeStyle='rgba(0,200,83,.5)';ctx.lineWidth=4;ctx.setLineDash([8,6]);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(this.route[0].x,this.route[0].y);for(let i=1;i<this.route.length;i++)ctx.lineTo(this.route[i].x,this.route[i].y);ctx.stroke();ctx.setLineDash([]);}
     if(this.pickup)this.drawMarker(this.pickup.x,this.pickup.y,'#FF9500','P');
     if(this.dropoff)this.drawMarker(this.dropoff.x,this.dropoff.y,'#00C853','D');
     if(this.courierPct>0){const pos=this.getCourierPos(this.courierPct);ctx.beginPath();ctx.arc(pos.x,pos.y,12,0,Math.PI*2);ctx.fillStyle='rgba(0,122,255,.15)';ctx.fill();ctx.beginPath();ctx.arc(pos.x,pos.y,6,0,Math.PI*2);ctx.fillStyle='#007AFF';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}
   },
-  drawMarker(x,y,c,l){const ctx=this.ctx;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 9px Plus Jakarta Sans,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(l,x,y);ctx.textAlign='start';ctx.textBaseline='alphabetic';},
+  drawMarker(x,y,c,l){const ctx=this.ctx;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 9px IBM Plex Sans,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(l,x,y);ctx.textAlign='start';ctx.textBaseline='alphabetic';},
   getCourierPos(pct){if(this.route.length<2)return{x:0,y:0};let tl=0;const segs=[];for(let i=1;i<this.route.length;i++){const dx=this.route[i].x-this.route[i-1].x,dy=this.route[i].y-this.route[i-1].y;segs.push(Math.sqrt(dx*dx+dy*dy));tl+=segs[segs.length-1];}let t=pct*tl;for(let i=0;i<segs.length;i++){if(t<=segs[i]){const r=t/segs[i];return{x:this.route[i].x+(this.route[i+1].x-this.route[i].x)*r,y:this.route[i].y+(this.route[i+1].y-this.route[i].y)*r};}t-=segs[i];}return this.route[this.route.length-1];}
 };
 
@@ -165,12 +165,22 @@ const Loading={
   show(day,duration,cb){
     const el=$('#loading'),stepsEl=$('#ld-steps'),msgEl=$('#ld-msg');
     const msgs=this.messages[day]||this.messages[1];
+    // Inject worker ID element
+    let workerEl=stepsEl.previousElementSibling;
+    if(!workerEl||!workerEl.classList.contains('ld-worker-id')){
+      workerEl=document.createElement('div');workerEl.className='ld-worker-id';
+      stepsEl.parentElement.insertBefore(workerEl,stepsEl);
+    }
+    workerEl.textContent='WORKER_ID: ████████';workerEl.classList.remove('visible');
     stepsEl.innerHTML=this.steps.map(s=>`<div class="ld-step"><div class="ld-step-icon"><svg viewBox="0 0 12 12" width="10" height="10"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span>${s}</span></div>`).join('');
     msgEl.textContent='';msgEl.style.opacity='0';
     el.classList.add('active');
     const stepEls=stepsEl.querySelectorAll('.ld-step'),sd=600;
     stepEls.forEach((se,i)=>{setTimeout(()=>se.classList.add('active'),i*sd);setTimeout(()=>{se.classList.remove('active');se.classList.add('done');SFX.play('tick');},((i+1)*sd)-100);});
     const ms=this.steps.length*sd+200;
+    // Reveal worker ID with generated value
+    const wid='WKR-'+Math.random().toString(36).substr(2,6).toUpperCase()+'-'+day;
+    setTimeout(()=>{workerEl.textContent='WORKER_ID: '+wid;workerEl.classList.add('visible');},ms-200);
     setTimeout(()=>{msgEl.textContent=msgs[0];msgEl.style.opacity='1';},ms);
     setTimeout(()=>{el.classList.remove('active');if(cb)cb();},duration);
   }
@@ -195,6 +205,7 @@ const ExtNotif={
   fire(key,delay){const tpl=this.templates[key];if(!tpl)return;setTimeout(()=>this.show(tpl),delay||0);},
   show(data){
     const container=$('#ext-notifs');if(!container)return;SFX.play('notif');
+    container.innerHTML='';
     const el=document.createElement('div');el.className='ext-notif';
     el.innerHTML=`<div class="en-head"><div class="en-icon" style="background:${data.icon};font-size:${data.letter.length>1?'7':'10'}px">${data.letter}</div><span class="en-app">${data.app}</span><span class="en-time">now</span></div><div class="en-body"><strong>${data.title}</strong> ${data.body}</div>`;
     container.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));
@@ -412,12 +423,15 @@ function showAppScreen(d){
   const shift=SHIFTS[d],app=$('#app-main');
   const notifText=typeof shift.appNotif==='function'?shift.appNotif(S):shift.appNotif;
   app.innerHTML='';
-  const notif=document.createElement('div');notif.className='push-notif';
+  const tipEl=$('#side-tip');
+  if(tipEl){
+    const ctxHtml=typeof shift.context==='function'?shift.context(S):shift.context;
+    tipEl.innerHTML=`<div class="side-tip-inner">${ctxHtml}</div>`;
+  }
+  const notif=document.createElement('div');notif.className='push-notif push-notif--toast';
   notif.innerHTML=`<div class="pn-head"><span class="pn-app">QuickBite</span><span class="pn-time">now</span></div><div class="pn-body">${notifText}</div>`;
   app.appendChild(notif);setTimeout(()=>{notif.classList.add('on');SFX.play('notif');},100);
-  const ctx=document.createElement('div');ctx.className='ctx-text';
-  ctx.innerHTML=typeof shift.context==='function'?shift.context(S):shift.context;
-  app.appendChild(ctx);
+  setTimeout(()=>{notif.classList.remove('on');notif.classList.add('exit');setTimeout(()=>notif.remove(),380);},4000);
   const en=typeof shift.extNotifs==='function'?shift.extNotifs(S):shift.extNotifs;
   if(en)en.forEach(n=>ExtNotif.fire(n.key,n.delay));
   if(S.stats.wellbeing<35&&d>=2)ExtNotif.fire('health_warn',7000);
@@ -433,7 +447,7 @@ function showOrderCard(d,order,isMain,onComplete){
   card.innerHTML=`<div class="oc-badge">NEW ORDER</div><div class="oc-head"><span class="oc-restaurant">${o.restaurant}</span><span class="oc-cuisine">${o.cuisine}</span></div><div class="oc-details"><span>${o.dist} km</span><span>~${o.time} min</span><span class="oc-pay ${o.surge?'surge':''}">\u20ac${o.pay.toFixed(2)}${o.surge?' SURGE':''}</span></div><div class="oc-quality">${o.quality}</div><div class="oc-timer-wrap"><svg class="oc-timer-svg" width="56" height="56" viewBox="0 0 56 56"><circle class="oc-timer-track" cx="28" cy="28" r="20"/><circle class="oc-timer-fill" cx="28" cy="28" r="20" stroke-dasharray="${circ}" stroke-dashoffset="0" transform="rotate(-90 28 28)"/><text class="oc-timer-text" x="28" y="28">15</text></svg></div><div class="oc-actions"><button class="oc-decline">Decline</button><button class="oc-accept">Accept</button></div>`;
   app.appendChild(card);setTimeout(()=>{card.classList.add('on');SFX.play('notif');},50);
   let tl=15;const tf=card.querySelector('.oc-timer-fill'),tt=card.querySelector('.oc-timer-text');
-  S.timer=setInterval(()=>{tl--;tt.textContent=tl;tf.setAttribute('stroke-dashoffset',-(circ*((15-tl)/15)));if(tl<=5){tf.style.stroke='var(--red)';SFX.play('tick');}if(tl<=0){clearInterval(S.timer);handleDecline(d,card,o,isMain,onComplete);}},1000);
+  S.timer=setInterval(()=>{tl--;tt.textContent=tl;tf.setAttribute('stroke-dashoffset',-(circ*((15-tl)/15)));if(tl<=5){tf.style.stroke='var(--red)';SFX.play('tick');card.classList.add('urgent');}if(tl<=0){clearInterval(S.timer);handleDecline(d,card,o,isMain,onComplete);}},1000);
   card.querySelector('.oc-accept').onclick=()=>{clearInterval(S.timer);SFX.play('accept');card.classList.add('accepted');updateClock(5);S.orderLog.push({restaurant:o.restaurant,dist:o.dist,pay:o.pay,status:'completed'});setTimeout(()=>{if(isMain)startDelivery(d,card);else startFillerDelivery(card,o,onComplete);},600);};
   card.querySelector('.oc-decline').onclick=()=>{clearInterval(S.timer);SFX.play('decline');handleDecline(d,card,o,isMain,onComplete);};
 }
@@ -517,7 +531,7 @@ function handleChoice(d,delScreen,choices,idx,desktop){
 }
 
 function showShiftEnd(d){
-  const shift=SHIFTS[d],app=$('#app-main');app.innerHTML='';S.dailyEarnings[d-1]=S.todayEarnings;
+  const shift=SHIFTS[d],app=$('#app-main');app.innerHTML='';const st=$('#side-tip');if(st)st.innerHTML='';S.dailyEarnings[d-1]=S.todayEarnings;
   const s=document.createElement('div');s.innerHTML=`<div class="ss-title-text">Shift Complete</div><div class="ss-day-text">${shift.sub} \u2014 ${shift.title}</div><div class="ss-grid"><div class="ss-stat"><div class="ss-stat-val">\u20ac${S.earnings.toFixed(2)}</div><div class="ss-stat-lbl">Total</div></div><div class="ss-stat"><div class="ss-stat-val">${(S.stats.rating/10).toFixed(1)}</div><div class="ss-stat-lbl">Rating</div></div><div class="ss-stat"><div class="ss-stat-val">${S.acceptance}%</div><div class="ss-stat-lbl">Accept</div></div><div class="ss-stat"><div class="ss-stat-val">${S.deliveries}</div><div class="ss-stat-lbl">Deliveries</div></div></div><button class="ss-insight-btn">Why did the algorithm do this?</button><div class="ss-insight"><div class="ins-section ins-plat"><h4>The Platform's Case</h4><div>${shift.insight.platformCase}</div></div><div class="ins-section ins-rawl"><h4>The Rawlsian Lens</h4><div>${shift.insight.rawlsianLens}</div></div></div><button class="ss-next">${d<5?'Continue to '+SHIFTS[d+1].sub:'See your ending'}</button>`;
   app.appendChild(s);
   s.querySelector('.ss-insight-btn').onclick=function(){const ins=s.querySelector('.ss-insight');ins.classList.toggle('open');this.textContent=ins.classList.contains('open')?'Close insight':'Why did the algorithm do this?';};
@@ -527,7 +541,9 @@ function showShiftEnd(d){
 function showEndScreen(){
   SFX.stopRain();SFX.stopCity();
   const type=S.endingType||getEnding();S.endingType=type;const e=ENDINGS[type];show('scr-end');
-  $('#end-content').innerHTML=`<div class="end-type">${e.title}</div><div class="end-text">${typeof e.text==='function'?e.text(S):e.text}</div><div class="end-stats"><div class="es"><span>Income</span><b style="color:var(--green)">${S.stats.income}</b></div><div class="es"><span>Rating</span><b style="color:var(--orange)">${S.stats.rating}</b></div><div class="es"><span>Health</span><b style="color:var(--red)">${S.stats.wellbeing}</b></div><div class="es"><span>Freedom</span><b style="color:var(--blue)">${S.stats.autonomy}</b></div></div><div class="end-trans">You just lived five days as a gig courier.<br><em>Now step behind the curtain.</em></div><button class="btn-primary" onclick="showPostGame()">Explore the analysis</button>`;
+  const endEl=$('#scr-end');endEl.className='screen active end-'+type;
+  const rawText=typeof e.text==='function'?e.text(S):e.text;
+  $('#end-content').innerHTML=`<div class="end-type">${e.title}</div><div class="end-text typewriter-wrap"><span class="typewriter">${rawText}</span></div><div class="end-stats"><div class="es"><span>Income</span><b style="color:var(--green)">${S.stats.income}</b></div><div class="es"><span>Rating</span><b style="color:var(--orange)">${S.stats.rating}</b></div><div class="es"><span>Health</span><b style="color:var(--red)">${S.stats.wellbeing}</b></div><div class="es"><span>Freedom</span><b style="color:var(--blue)">${S.stats.autonomy}</b></div></div><div class="end-trans">You just lived five days as a gig courier.<br><em>Now step behind the curtain.</em></div><button class="btn-primary" onclick="showPostGame()">Explore the analysis</button>`;
 }
 
 function showPostGame(){

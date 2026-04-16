@@ -6,21 +6,21 @@
   <title>QuickBite Courier</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- Loading Overlay -->
   <div id="loading" class="loading">
-    <div class="ld-grid"></div>
+    <div class="ld-grain" aria-hidden="true"></div>
+    <div class="ld-vignette" aria-hidden="true"></div>
     <div class="ld-inner">
       <svg class="ld-logo" viewBox="0 0 48 48" width="56" height="56"><rect width="48" height="48" rx="12" fill="#00C853"/><path d="M14 24 L21 31 L34 17" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <div class="ld-brand">QuickBite</div>
       <div class="ld-steps" id="ld-steps"></div>
       <div class="ld-msg" id="ld-msg"></div>
     </div>
-    <div class="ld-city"></div>
   </div>
 
   <!-- ONBOARDING -->
@@ -62,24 +62,23 @@
 
   <!-- GAME -->
   <div id="scr-game" class="screen">
+    <div class="game-bg" aria-hidden="true"></div>
+    <div class="game-clouds" aria-hidden="true">
+      <span class="cloud c1"></span>
+      <span class="cloud c2"></span>
+      <span class="cloud c3"></span>
+      <span class="cloud c4"></span>
+    </div>
     <!-- LEFT: Silhouette stats (desktop) -->
     <div class="side-panel side-left" id="panel-left">
       <div class="silhouette-wrap">
-        <svg class="silhouette" viewBox="0 0 120 300" width="120" height="300">
-          <circle cx="60" cy="35" r="22" fill="#2A2A3E" opacity=".15"/>
-          <rect x="52" y="55" width="16" height="14" rx="4" fill="#2A2A3E" opacity=".12"/>
-          <path d="M30 69 Q30 65 38 62 L52 58 L68 58 L82 62 Q90 65 90 69 L90 160 Q90 170 80 172 L40 172 Q30 170 30 160Z" fill="#2A2A3E" opacity=".12"/>
-          <path d="M30 72 Q20 75 16 95 L12 130 Q10 138 16 140 Q22 142 24 134 L30 105" fill="#2A2A3E" opacity=".1"/>
-          <path d="M90 72 Q100 75 104 95 L108 130 Q110 138 104 140 Q98 142 96 134 L90 105" fill="#2A2A3E" opacity=".1"/>
-          <path d="M40 170 L35 230 L32 270 Q30 280 38 280 L48 280 Q52 280 52 274 L50 230 L48 170" fill="#2A2A3E" opacity=".1"/>
-          <path d="M72 170 L75 230 L78 270 Q80 280 72 280 L62 280 Q58 280 58 274 L60 230 L62 170" fill="#2A2A3E" opacity=".1"/>
-        </svg>
-        <div class="stat-orb orb-brain" data-stat="autonomy"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">70</span><span class="orb-label">Freedom</span></div>
-        <div class="stat-orb orb-heart" data-stat="wellbeing"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">65</span><span class="orb-label">Health</span></div>
-        <div class="stat-orb orb-star" data-stat="rating"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">50</span><span class="orb-label">Rating</span></div>
-        <div class="stat-orb orb-pocket" data-stat="income"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">50</span><span class="orb-label">Income</span></div>
+        <div class="stat-orb" data-stat="autonomy"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">70</span><span class="orb-label">Autonomy</span></div>
+        <div class="stat-orb" data-stat="wellbeing"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">65</span><span class="orb-label">Wellness</span></div>
+        <div class="stat-orb" data-stat="rating"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">50</span><span class="orb-label">Score</span></div>
+        <div class="stat-orb" data-stat="income"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">50</span><span class="orb-label">Earnings</span></div>
       </div>
       <div class="side-day" id="side-day"></div>
+      <div id="side-tip" class="side-tip"></div>
     </div>
 
     <!-- CENTER: Phone -->
@@ -117,6 +116,7 @@
         <div class="bn-item" data-tab="wallet"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M21 18v1a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v1h-9a2 2 0 00-2 2v8a2 2 0 002 2h9zm-9-2h10V8H12v8zm4-2.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill="currentColor"/></svg><span>Wallet</span></div>
       </div>
       <div class="home-bar"></div>
+      <div class="phone-scanline" aria-hidden="true"></div>
     </div>
 
     <!-- RIGHT: Thought bubbles (desktop) -->
