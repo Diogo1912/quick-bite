@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>QuickBite Courier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="loading" class="loading">
+    <div class="ld-grid"></div>
+    <div class="ld-inner">
+      <svg class="ld-logo" viewBox="0 0 48 48" width="56" height="56"><rect width="48" height="48" rx="12" fill="#00C853"/><path d="M14 24 L21 31 L34 17" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="ld-brand">QuickBite</div>
+      <div class="ld-steps" id="ld-steps"></div>
+      <div class="ld-msg" id="ld-msg"></div>
+    </div>
+    <div class="ld-city"></div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div id="scr-title" class="screen active">
+    <div class="onboard">
+      <!-- Step 1: Welcome -->
+      <div class="ob-step ob-step-1 active" id="ob-step1">
+        <div class="ob-hero">
+          <svg class="ob-logo" viewBox="0 0 80 80" width="72" height="72"><rect width="80" height="80" rx="18" fill="#00C853"/><path d="M24 40 L34 50 L56 26" stroke="#fff" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h1 class="ob-title">QuickBite <span>Courier</span></h1>
+          <p class="ob-sub">Deliver food. Set your own hours.<br>Be your own boss.</p>
+        </div>
+        <div class="ob-features">
+          <div class="ob-feat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00C853" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Flexible hours</span></div>
+          <div class="ob-feat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00C853" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Weekly payments</span></div>
+          <div class="ob-feat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00C853" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span>Join 10,000+ couriers</span></div>
+        </div>
+        <label class="ob-tos"><input type="checkbox" id="tos-check"><div class="ob-checkbox"><svg viewBox="0 0 12 12" width="12" height="12"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>I agree to the <a href="#" onclick="return false">Independent Contractor Agreement</a> and <a href="#" onclick="return false">Platform Terms of Service</a></span></label>
+        <button id="btn-next" class="btn-primary" disabled>Continue</button>
+      </div>
+
+      <!-- Step 2: Profile -->
+      <div class="ob-step ob-step-2" id="ob-step2">
+        <h2 class="ob-step-title">Set up your profile</h2>
+        <p class="ob-step-sub">What should we call you?</p>
+        <input type="text" id="ob-name" class="ob-input" placeholder="Your first name" maxlength="20" autocomplete="off">
+        <p class="ob-step-sub" style="margin-top:20px">How will you deliver?</p>
+        <div class="ob-vehicles">
+          <button class="ob-veh active" data-v="bike"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h3l2 5.5M5.5 17.5l3-8h5l2.5 5.5M8.5 9.5L12 6"/></svg><span>Bicycle</span></button>
+          <button class="ob-veh" data-v="scooter"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M18 15V8a2 2 0 00-2-2h-3l-2 4h5M6 15v-3h8"/></svg><span>Scooter</span></button>
+          <button class="ob-veh" data-v="car"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14M5 17a2 2 0 01-2-2v-3l2-5h14l2 5v3a2 2 0 01-2 2M5 17a2 2 0 100 4 2 2 0 000-4zM19 17a2 2 0 100 4 2 2 0 000-4z"/></svg><span>Car</span></button>
+        </div>
+        <button id="btn-start" class="btn-primary">Start delivering</button>
+      </div>
+
+      <p class="ob-foot">Diogo Baptista -- CME 2026</p>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="scr-game" class="screen">
+    <!-- LEFT: Silhouette stats (desktop) -->
+    <div class="side-panel side-left" id="panel-left">
+      <div class="silhouette-wrap">
+        <svg class="silhouette" viewBox="0 0 120 300" width="120" height="300">
+          <circle cx="60" cy="35" r="22" fill="#2A2A3E" opacity=".15"/>
+          <rect x="52" y="55" width="16" height="14" rx="4" fill="#2A2A3E" opacity=".12"/>
+          <path d="M30 69 Q30 65 38 62 L52 58 L68 58 L82 62 Q90 65 90 69 L90 160 Q90 170 80 172 L40 172 Q30 170 30 160Z" fill="#2A2A3E" opacity=".12"/>
+          <path d="M30 72 Q20 75 16 95 L12 130 Q10 138 16 140 Q22 142 24 134 L30 105" fill="#2A2A3E" opacity=".1"/>
+          <path d="M90 72 Q100 75 104 95 L108 130 Q110 138 104 140 Q98 142 96 134 L90 105" fill="#2A2A3E" opacity=".1"/>
+          <path d="M40 170 L35 230 L32 270 Q30 280 38 280 L48 280 Q52 280 52 274 L50 230 L48 170" fill="#2A2A3E" opacity=".1"/>
+          <path d="M72 170 L75 230 L78 270 Q80 280 72 280 L62 280 Q58 280 58 274 L60 230 L62 170" fill="#2A2A3E" opacity=".1"/>
+        </svg>
+        <div class="stat-orb orb-brain" data-stat="autonomy"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">70</span><span class="orb-label">Freedom</span></div>
+        <div class="stat-orb orb-heart" data-stat="wellbeing"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">65</span><span class="orb-label">Health</span></div>
+        <div class="stat-orb orb-star" data-stat="rating"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">50</span><span class="orb-label">Rating</span></div>
+        <div class="stat-orb orb-pocket" data-stat="income"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="orb-track"/><circle cx="22" cy="22" r="18" class="orb-fill"/></svg><span class="orb-val">50</span><span class="orb-label">Income</span></div>
+      </div>
+      <div class="side-day" id="side-day"></div>
+    </div>
+
+    <!-- CENTER: Phone -->
+    <div id="phone">
+      <div class="sb"><span class="sb-time" id="sb-time">9:41</span><div class="sb-island"></div><div class="sb-icons"><svg viewBox="0 0 18 12" width="16" height="11"><rect x="0" y="9" width="3" height="3" rx=".5" fill="currentColor" opacity=".4"/><rect x="5" y="6" width="3" height="6" rx=".5" fill="currentColor" opacity=".6"/><rect x="10" y="3" width="3" height="9" rx=".5" fill="currentColor" opacity=".8"/><rect x="15" y="0" width="3" height="12" rx=".5" fill="currentColor"/></svg><svg viewBox="0 0 16 12" width="15" height="11"><path d="M8 10a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="currentColor"/><path d="M4.5 8.5a5 5 0 017 0" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M1.5 5.5a9 9 0 0113 0" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><div class="sb-batt"><div class="sb-batt-body"><div class="sb-batt-fill" id="sb-batt-fill"></div></div><div class="sb-batt-cap"></div></div></div></div>
+      <div class="ah">
+        <div class="ah-left"><svg viewBox="0 0 28 28" width="22" height="22"><rect width="28" height="28" rx="6" fill="#00C853"/><path d="M8 14L12 18L20 10" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="ah-name">QuickBite</span></div>
+        <div class="ah-right"><div class="ah-chip"><svg viewBox="0 0 14 14" width="11" height="11"><path d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.2 3.3 12.3l.7-4.1-3-2.9 4.2-.7z" fill="#FF9500"/></svg><span id="hdr-rating">5.0</span></div><div class="ah-chip ah-earn" id="hdr-earn">&euro;0.00</div><div class="ah-chip ah-acc" id="hdr-acc">100%</div><button id="sound-btn" class="ah-sound" title="Toggle sound"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 3L5 7H2v6h3l5 4V3z" fill="currentColor"/><path class="sw" d="M13 7.5a3.5 3.5 0 010 5M15 5.5a6.5 6.5 0 010 9" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></button></div>
+      </div>
+
+      <!-- Mobile stat orbs (inside phone, top-left floating) -->
+      <div class="mob-stats" id="mob-stats">
+        <div class="ms-orb" data-stat="autonomy"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" class="orb-track"/><circle cx="16" cy="16" r="13" class="orb-fill"/></svg><span class="ms-val">70</span></div>
+        <div class="ms-orb" data-stat="wellbeing"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" class="orb-track"/><circle cx="16" cy="16" r="13" class="orb-fill"/></svg><span class="ms-val">65</span></div>
+        <div class="ms-orb" data-stat="rating"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" class="orb-track"/><circle cx="16" cy="16" r="13" class="orb-fill"/></svg><span class="ms-val">50</span></div>
+        <div class="ms-orb" data-stat="income"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" class="orb-track"/><circle cx="16" cy="16" r="13" class="orb-fill"/></svg><span class="ms-val">50</span></div>
+      </div>
+
+      <!-- Tab views -->
+      <div class="tab-views">
+        <div class="tab-view active" id="tab-map">
+          <div class="map-wrap" id="map-wrap"><canvas id="map-canvas"></canvas><div class="map-fade"></div></div>
+          <div id="ext-notifs"></div>
+          <div id="day-splash"></div>
+          <div id="app-main"></div>
+        </div>
+        <div class="tab-view" id="tab-orders"><div class="tv-header">Order History</div><div class="tv-body" id="orders-list"><div class="tv-empty">No orders yet. Start delivering!</div></div></div>
+        <div class="tab-view" id="tab-wallet"><div class="tv-header">Earnings</div><div class="tv-body" id="wallet-content"><div class="wl-hero"><span class="wl-total" id="wl-total">&euro;0.00</span><span class="wl-sub">Total this week</span></div><div class="wl-grid"><div class="wl-card"><span class="wl-card-val" id="wl-today">&euro;0.00</span><span class="wl-card-lbl">Today</span></div><div class="wl-card"><span class="wl-card-val" id="wl-avg">&euro;0.00</span><span class="wl-card-lbl">Per delivery</span></div><div class="wl-card"><span class="wl-card-val" id="wl-del">0</span><span class="wl-card-lbl">Deliveries</span></div><div class="wl-card"><span class="wl-card-val" id="wl-hours">0h</span><span class="wl-card-lbl">Online</span></div></div><div class="wl-chart" id="wl-chart"></div></div></div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bn">
+        <div class="bn-item active" data-tab="map"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" fill="currentColor"/></svg><span>Map</span></div>
+        <div class="bn-item" data-tab="orders"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span>Orders</span></div>
+        <div class="bn-item" data-tab="wallet"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M21 18v1a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v1h-9a2 2 0 00-2 2v8a2 2 0 002 2h9zm-9-2h10V8H12v8zm4-2.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill="currentColor"/></svg><span>Wallet</span></div>
+      </div>
+      <div class="home-bar"></div>
+    </div>
+
+    <!-- RIGHT: Thought bubbles (desktop) -->
+    <div class="side-panel side-right" id="panel-right"></div>
+
+    <!-- Mobile thought overlay (inside scr-game but outside phone) -->
+    <div class="mob-thoughts" id="mob-thoughts"></div>
+  </div>
+
+  <!-- ENDING -->
+  <div id="scr-end" class="screen"><div id="end-content"></div></div>
+
+  <!-- POST-GAME -->
+  <div id="scr-post" class="screen">
+    <div class="pg-tabs">
+      <button class="pt-btn active" data-t="platform">Platform's Case</button>
+      <button class="pt-btn" data-t="rawls">Rawlsian Analysis</button>
+      <button class="pt-btn" data-t="reality">Reality &amp; Sources</button>
+    </div>
+    <div id="tp" class="pt-pane active"></div>
+    <div id="tr" class="pt-pane"></div>
+    <div id="tre" class="pt-pane"></div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
