@@ -6,7 +6,7 @@
   <title>QuickBite Courier</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -69,6 +69,14 @@
       <span class="cloud c3"></span>
       <span class="cloud c4"></span>
     </div>
+    <!-- Mobile top stat bar -->
+    <div class="mob-statbar" id="mob-statbar" aria-hidden="true">
+      <div class="msb-orb" data-stat="autonomy"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" class="orb-track"/><circle cx="14" cy="14" r="11" class="orb-fill"/></svg><span class="msb-val">70</span><span class="msb-lbl">AUT</span></div>
+      <div class="msb-orb" data-stat="wellbeing"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" class="orb-track"/><circle cx="14" cy="14" r="11" class="orb-fill"/></svg><span class="msb-val">65</span><span class="msb-lbl">WEL</span></div>
+      <div class="msb-orb" data-stat="rating"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" class="orb-track"/><circle cx="14" cy="14" r="11" class="orb-fill"/></svg><span class="msb-val">50</span><span class="msb-lbl">SCR</span></div>
+      <div class="msb-orb" data-stat="income"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" class="orb-track"/><circle cx="14" cy="14" r="11" class="orb-fill"/></svg><span class="msb-val">50</span><span class="msb-lbl">EUR</span></div>
+    </div>
+
     <!-- LEFT: Silhouette stats (desktop) -->
     <div class="side-panel side-left" id="panel-left">
       <div class="silhouette-wrap">
@@ -132,9 +140,9 @@
   <!-- POST-GAME -->
   <div id="scr-post" class="screen">
     <div class="pg-tabs">
-      <button class="pt-btn active" data-t="platform">Platform's Case</button>
-      <button class="pt-btn" data-t="rawls">Rawlsian Analysis</button>
-      <button class="pt-btn" data-t="reality">Reality &amp; Sources</button>
+      <button class="pt-btn active" data-t="platform">I · Platform</button>
+      <button class="pt-btn" data-t="rawls">II · Rawls</button>
+      <button class="pt-btn" data-t="reality">III · Reality</button>
     </div>
     <div id="tp" class="pt-pane active"></div>
     <div id="tr" class="pt-pane"></div>

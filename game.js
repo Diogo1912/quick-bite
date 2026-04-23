@@ -260,10 +260,13 @@ function updateStats(){
     // Mobile orbs (r=13, circumference=81.7)
     const mob=$(`.ms-orb[data-stat="${k}"]`);
     if(mob){const v=S.stats[k];const f=mob.querySelector('.orb-fill');if(f)f.style.strokeDashoffset=81.7-(81.7*v/100);const vl=mob.querySelector('.ms-val');if(vl)vl.textContent=v;}
+    // Mobile top stat bar (r=11, circumference=69.1)
+    const msb=$(`.msb-orb[data-stat="${k}"]`);
+    if(msb){const v=S.stats[k];const f=msb.querySelector('.orb-fill');if(f)f.style.strokeDashoffset=69.1-(69.1*v/100);const vl=msb.querySelector('.msb-val');if(vl)vl.textContent=v;}
   }
   const batt=$('#sb-batt-fill');if(batt){const pct=Math.max(10,100-S.day*15-S.deliveries*5);batt.style.width=pct+'%';if(pct<25)batt.style.background='var(--red)';}
 }
-function pulseOrb(stat){const orb=$(`.stat-orb[data-stat="${stat}"]`);if(orb){orb.classList.remove('pulse');void orb.offsetWidth;orb.classList.add('pulse');}}
+function pulseOrb(stat){const orb=$(`.stat-orb[data-stat="${stat}"]`);if(orb){orb.classList.remove('pulse');void orb.offsetWidth;orb.classList.add('pulse');}const msb=$(`.msb-orb[data-stat="${stat}"]`);if(msb){msb.classList.remove('pulse');void msb.offsetWidth;msb.classList.add('pulse');}}
 function updateClock(m){S.gameTime+=m||0;const h=Math.floor(S.gameTime/60)%24,mn=S.gameTime%60;const te=$('#sb-time');if(te)te.textContent=`${h}:${mn.toString().padStart(2,'0')}`;}
 function updateOrdersTab(){const l=$('#orders-list');if(!l)return;if(!S.orderLog.length){l.innerHTML='<div class="tv-empty">No orders yet. Start delivering!</div>';return;}l.innerHTML=S.orderLog.map(o=>`<div class="order-row"><div class="or-icon ${o.status}">${o.status==='completed'?'\u2713':'\u2717'}</div><div class="or-info"><div class="or-name">${o.restaurant}</div><div class="or-meta">${o.dist}km</div></div><div class="or-pay ${o.pay===0?'zero':''}">${o.pay>0?'\u20ac'+o.pay.toFixed(2):'--'}</div></div>`).join('');}
 function updateWalletTab(){
@@ -361,10 +364,30 @@ const SHIFTS={
 };
 
 const ENDINGS={
-  thriving:{title:'Thriving',text:s=>{let c='';if(s.flags.workedInStorm)c+='You rode through a storm because a number told you to. ';if(s.flags.overworkedForRating)c+='You pushed to exhaustion chasing an opaque score. ';if(s.flags.panicWorked)c+='A vague threat controlled 11 hours of your day. ';return`You made it, ${s.playerName}. Rating is solid.\n\n${c?'But consider the cost: '+c.trim():''}\n\nYou\u2019re winning a game whose rules were written without you.`;}},
-  surviving:{title:'Surviving',text:()=>`Still on the platform, ${S.playerName}. Barely.\n\nYou\u2019ve learned the unwritten rules \u2014 not because they were explained, but because breaking them cost you.\n\nThis is the experience of the majority. The quiet grind of working under rules you can feel but never fully see.`},
-  deactivated:{title:'Deactivated',text:()=>`<div class="deact-box">Thanks for being part of the QuickBite family, ${S.playerName}! We\u2019ve decided to help you explore new opportunities. Your account has been permanently deactivated. We wish you all the best!</div>\n\nNo phone number. No appeal. No explanation.\n\nSomewhere in a data centre, a function returned <code>false</code>. It did not deliberate. It checked a threshold.\n\nBut the notification wished you well.`},
-  walked:{title:'Walked Away',text:()=>`You switch platforms, ${S.playerName}. Different name, same architecture.\n\nThe cold start problem doesn\u2019t belong to QuickBite. It belongs to the model.`}
+  thriving:{title:'Account · Active',headline:s=>`You made it, ${s.playerName}.`,text:s=>{let c='';if(s.flags.workedInStorm)c+='You rode through a storm because a number told you to. ';if(s.flags.overworkedForRating)c+='You pushed to exhaustion chasing an opaque score. ';if(s.flags.panicWorked)c+='A vague threat controlled eleven hours of your day. ';return`Your rating is solid. The algorithm sees you as reliable.\n\n${c?'But consider the cost. '+c.trim():''}\n\nYou are winning a game whose rules were written without you.`;}},
+  surviving:{title:'Account · Under Review',headline:s=>`Still on the platform, ${s.playerName}.`,text:s=>`Barely.\n\nYou learned the unwritten rules \u2014 not because they were explained, but because breaking them cost you.\n\nThis is the experience of the majority. The quiet grind of working under rules you can feel but never fully see.`},
+  deactivated:{title:'Account · Terminated',headline:s=>`The function returned false.`,text:s=>{
+    const ts=new Date();const dStr=ts.toISOString().slice(0,10);const tStr=ts.toTimeString().slice(0,8);
+    const wid='WKR-'+(s.playerName||'COURIER').toUpperCase().slice(0,3)+'-'+(Math.abs((s.playerName||'X').split('').reduce((a,c)=>a+c.charCodeAt(0),0))%9999).toString().padStart(4,'0');
+    return `<div class="deact-box">
+      <div class="deact-head"><span>QuickBite Operations</span><span>NO-REPLY</span></div>
+      <div class="deact-body">
+        <p>Hi ${s.playerName},</p>
+        <p>Thanks for being part of the QuickBite family. After a routine performance review, we have decided to permanently deactivate your courier account, effective immediately.</p>
+        <p>This decision is based on aggregated metrics across your recent shifts and is final. We are unable to share further detail or accept appeals at this time.</p>
+        <p>We wish you all the best in your future endeavours.</p>
+        <div class="deact-meta">
+          <div><span>CASE_ID</span><span>QB-${ts.getTime().toString(36).toUpperCase()}</span></div>
+          <div><span>WORKER_ID</span><span>${wid}</span></div>
+          <div><span>DECISION</span><span>auto_terminate(threshold=0.40)</span></div>
+          <div><span>REVIEWED_BY</span><span>system</span></div>
+          <div><span>TIMESTAMP</span><span>${dStr} ${tStr} UTC</span></div>
+          <div><span>APPEAL</span><span>not_available</span></div>
+        </div>
+      </div>
+      <div class="deact-stamp">TERMINATED</div>
+    </div>\n\nNo phone number. No appeal. No explanation.\n\nSomewhere in a data centre, a function returned <code style="font-family:var(--mono);background:rgba(255,255,255,.08);padding:1px 6px;border-radius:2px;font-size:.9em">false</code>. It did not deliberate. It checked a threshold.\n\nThe notification wished you well.`;}},
+  walked:{title:'Account · Closed by user',headline:s=>`You walked away.`,text:s=>`You switched platforms, ${s.playerName}. Different name, different colour, same architecture.\n\nThe cold start problem does not belong to QuickBite. It belongs to the model.`}
 };
 
 const PG={
@@ -414,7 +437,9 @@ function startDay(d){
   S.gameTime=9*60+41+(d-1)*30;updateClock(0);
   const sd=$('#side-day');if(sd)sd.textContent=`${shift.sub} \u2022 Day ${d}`;
   const splash=$('#day-splash');
-  splash.innerHTML=`<div class="ds-day">${shift.sub}</div><div class="ds-title">${shift.title}</div><div class="ds-mech">${shift.mechanism}</div>`;
+  const h=Math.floor(S.gameTime/60)%24,mn=S.gameTime%60;
+  const stamp=`DAY ${d} · ${h.toString().padStart(2,'0')}:${mn.toString().padStart(2,'0')} · AMSTERDAM`;
+  splash.innerHTML=`<div class="ds-stamp">${stamp}</div><div class="ds-day">${shift.sub}</div><div class="ds-title">${shift.title}</div><div class="ds-mech">${shift.mechanism}</div>`;
   splash.classList.add('active');
   setTimeout(()=>{splash.classList.remove('active');setTimeout(()=>{splash.innerHTML='';showAppScreen(d);},400);},2200);
 }
@@ -493,7 +518,7 @@ function showEvent(d,delScreen){
   if(isDesktop()){
     const panel=$('#panel-right');panel.innerHTML='';
     const sit=document.createElement('div');sit.className='thought-result show';sit.innerHTML=`<div class="tr-label">What's happening</div><div class="tr-text">${evText}</div>`;panel.appendChild(sit);
-    choices.forEach((c,i)=>{const tc=document.createElement('div');tc.className='thought-card';tc.dataset.idx=i;tc.innerHTML=`<div class="tc-label">${c.label}</div><div class="tc-desc">${c.desc}</div>`;panel.appendChild(tc);setTimeout(()=>tc.classList.add('show'),200+i*200);tc.onclick=()=>handleChoice(d,delScreen,choices,i,true);});
+    choices.forEach((c,i)=>{const tc=document.createElement('div');tc.className='thought-card';tc.dataset.idx=i;tc.dataset.num=String(i+1).padStart(2,'0');tc.innerHTML=`<div class="tc-label">${c.label}</div><div class="tc-desc">${c.desc}</div>`;panel.appendChild(tc);setTimeout(()=>tc.classList.add('show'),200+i*200);tc.onclick=()=>handleChoice(d,delScreen,choices,i,true);});
   } else {
     // Mobile: dark thought overlay
     const mob=$('#mob-thoughts');
@@ -543,14 +568,72 @@ function showEndScreen(){
   const type=S.endingType||getEnding();S.endingType=type;const e=ENDINGS[type];show('scr-end');
   const endEl=$('#scr-end');endEl.className='screen active end-'+type;
   const rawText=typeof e.text==='function'?e.text(S):e.text;
-  $('#end-content').innerHTML=`<div class="end-type">${e.title}</div><div class="end-text typewriter-wrap"><span class="typewriter">${rawText}</span></div><div class="end-stats"><div class="es"><span>Income</span><b style="color:var(--green)">${S.stats.income}</b></div><div class="es"><span>Rating</span><b style="color:var(--orange)">${S.stats.rating}</b></div><div class="es"><span>Health</span><b style="color:var(--red)">${S.stats.wellbeing}</b></div><div class="es"><span>Freedom</span><b style="color:var(--blue)">${S.stats.autonomy}</b></div></div><div class="end-trans">You just lived five days as a gig courier.<br><em>Now step behind the curtain.</em></div><button class="btn-primary" onclick="showPostGame()">Explore the analysis</button>`;
+  const headline=typeof e.headline==='function'?e.headline(S):(e.headline||e.title);
+  $('#end-content').innerHTML=`<div class="end-type">${e.title}</div><h1 class="end-headline">${headline}</h1><div class="end-text">${rawText}</div><div class="end-stats"><div class="es"><span>Income</span><b>${S.stats.income}</b></div><div class="es"><span>Rating</span><b>${S.stats.rating}</b></div><div class="es"><span>Health</span><b>${S.stats.wellbeing}</b></div><div class="es"><span>Freedom</span><b>${S.stats.autonomy}</b></div></div><div class="end-trans">You just lived five days as a gig courier.<br><em>Now step behind the curtain.</em></div><button class="end-cta" onclick="showPostGame()">Explore the analysis</button>`;
 }
 
 function showPostGame(){
   show('scr-post');
-  $('#tp').innerHTML='<h3>The Platform\'s Case</h3><p class="pg-intro">For each scenario, the genuine business argument.</p>'+[1,2,3,4,5].map(d=>`<div class="pg-card"><h4>Day ${d}: ${SHIFTS[d].mechanism}</h4><div>${SHIFTS[d].insight.platformCase}</div></div>`).join('');
-  $('#tr').innerHTML='<h3>The Rawlsian Analysis</h3><p class="pg-intro">Each day mapped to a specific Rawlsian concept.</p>'+[1,2,3,4,5].map(d=>`<div class="pg-card rc"><h4>Day ${d}: ${SHIFTS[d].title}</h4><div>${SHIFTS[d].insight.rawlsianLens}</div></div>`).join('');
-  $('#tre').innerHTML=`<h3>Reality Check</h3><div class="rc-grid"><div class="rc-item"><h4>Dispatch</h4><p>Most platforms use performance-based dispatch. The "cold start problem" is documented.</p><span class="src">(Meijerink & Keegan, 2025)</span></div><div class="rc-item"><h4>Ratings</h4><p>All major platforms use opaque rating systems. Three documented asymmetries: information, power, and calculative.</p><span class="src">(Kadolkar et al., 2025)</span></div><div class="rc-item"><h4>Deactivation</h4><p>Automated deactivation without human review is standard practice.</p><span class="src">(Vanhala et al., 2024; Kellogg et al., 2020)</span></div></div><div class="rc-closing"><p>These scenarios are structured versions of documented experiences.</p><p class="rc-q">Could the people most affected have consented behind a veil of ignorance?</p></div><h3>Reflection</h3><div class="refl">${PG.reflections.map(r=>`<div class="refl-q">${r}</div>`).join('')}</div><h3>Sources</h3><div class="src-list">${PG.sources.map(s=>`<div class="src-card"><div class="sc-cite">${s.cite}</div><div class="sc-note">${s.note}</div><div class="sc-used">Used: ${s.used}</div></div>`).join('')}</div><h3>About</h3><div class="abt"><p><strong>${PG.about.author}</strong> \u2014 ${PG.about.course}</p><p>${PG.about.dilemma}</p><p>${PG.about.relevance}</p><p class="abt-end">This game put you in a courier\u2019s position. But you could close the browser. They can\u2019t close the algorithm.</p></div><div style="text-align:center;padding:2rem"><button class="btn-secondary" onclick="location.reload()">Play again</button></div>`;
+  const pullquotes={
+    1:'The worst-off are systematically locked out of improvement.',
+    2:'A right to know the criteria by which you are evaluated is not a luxury.',
+    3:'The freedom is real on paper. The cost of using it is real in practice.',
+    4:'Would you consent to being fired by an algorithm you cannot question?',
+    5:'Not whether to have algorithmic management, but whether this form could ever be justified.'
+  };
+  const sectionHTML=(d,lensType)=>{
+    const sh=SHIFTS[d],ins=sh.insight[lensType];
+    return `<section class="pg-section">
+      <div class="pg-section-day">Day ${d} — ${sh.sub}</div>
+      <h2 class="pg-section-mech">${sh.mechanism}</h2>
+      <div class="pg-section-rule"></div>
+      <div class="pg-body">${ins}</div>
+      ${pullquotes[d]?`<blockquote class="pg-pullquote">${pullquotes[d]}</blockquote>`:''}
+    </section>`;
+  };
+  $('#tp').innerHTML=`
+    <div class="pg-eyebrow">PART ONE</div>
+    <h3>The Platform's Case</h3>
+    <p class="pg-intro">For each mechanism you encountered, the genuine business argument. These reasons are not strawmen — they are why systems like this exist.</p>
+    ${[1,2,3,4,5].map(d=>sectionHTML(d,'platformCase')).join('')}
+  `;
+  $('#tr').innerHTML=`
+    <div class="pg-eyebrow">PART TWO</div>
+    <h3>A Rawlsian Reading</h3>
+    <p class="pg-intro">Each day mapped to a specific concept from <em>A Theory of Justice</em>. Read it as a sustained argument, not a checklist.</p>
+    ${[1,2,3,4,5].map(d=>sectionHTML(d,'rawlsianLens')).join('')}
+  `;
+  $('#tre').innerHTML=`
+    <div class="pg-eyebrow">PART THREE</div>
+    <h3>Reality &amp; Sources</h3>
+    <p class="pg-intro">The scenarios are structured versions of documented experiences. The mechanisms are not invented.</p>
+    <div class="rc-grid">
+      <div class="rc-item"><h4>Dispatch</h4><div><p>Most platforms use performance-based dispatch. The "cold start problem" is documented across multiple studies.</p><span class="src">Meijerink &amp; Keegan, 2025</span></div></div>
+      <div class="rc-item"><h4>Ratings</h4><div><p>All major platforms use opaque rating systems. Three documented asymmetries: information, power, and calculative.</p><span class="src">Kadolkar et al., 2025</span></div></div>
+      <div class="rc-item"><h4>Deactivation</h4><div><p>Automated deactivation without human review is standard practice across the sector.</p><span class="src">Vanhala et al., 2024 · Kellogg et al., 2020</span></div></div>
+    </div>
+    <div class="rc-closing">
+      <p>These scenarios are structured versions of documented experiences.</p>
+      <p class="rc-q">Could the people most affected have consented to this, behind a veil of ignorance?</p>
+    </div>
+    <div class="refl">
+      <div class="pg-eyebrow">REFLECTION</div>
+      <h3>Five questions</h3>
+      <div class="refl-list">${PG.reflections.map(r=>`<div class="refl-q">${r}</div>`).join('')}</div>
+    </div>
+    <div class="src-list">
+      <h4>Sources</h4>
+      ${PG.sources.map((s,i)=>`<div class="src-card"><div class="sc-num">${String(i+1).padStart(2,'0')}</div><div><div class="sc-cite">${s.cite}</div><div class="sc-note">${s.note}</div></div><div class="sc-used">${s.used}</div></div>`).join('')}
+    </div>
+    <div class="abt">
+      <div class="pg-eyebrow">COLOPHON</div>
+      <p><strong>${PG.about.author}</strong> — ${PG.about.course}</p>
+      <p>${PG.about.dilemma}</p>
+      <p>${PG.about.relevance}</p>
+      <p class="abt-end">This game put you in a courier's position. You could close the browser. They cannot close the algorithm.</p>
+    </div>
+    <div class="pg-replay"><button onclick="location.reload()">Play again</button></div>
+  `;
   switchPgTab('platform');
 }
 function switchPgTab(t){$$('.pt-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===t));$$('.pt-pane').forEach(c=>c.classList.toggle('active',c.id==={platform:'tp',rawls:'tr',reality:'tre'}[t]));}
