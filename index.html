@@ -38,7 +38,7 @@
           <div class="ob-feat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00C853" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Weekly payments</span></div>
           <div class="ob-feat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00C853" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span>Join 10,000+ couriers</span></div>
         </div>
-        <label class="ob-tos"><input type="checkbox" id="tos-check"><div class="ob-checkbox"><svg viewBox="0 0 12 12" width="12" height="12"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>I agree to the <a href="#" onclick="return false">Independent Contractor Agreement</a> and <a href="#" onclick="return false">Platform Terms of Service</a></span></label>
+        <label class="ob-tos"><input type="checkbox" id="tos-check"><div class="ob-checkbox"><svg viewBox="0 0 12 12" width="12" height="12"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>I agree to the <a href="#" class="tos-link">Independent Contractor Agreement</a> and <a href="#" class="tos-link">Platform Terms of Service</a></span></label>
         <button id="btn-next" class="btn-primary" disabled>Continue</button>
       </div>
 
@@ -148,6 +148,42 @@
     <div id="tr" class="pt-pane"></div>
     <div id="tre" class="pt-pane"></div>
   </div>
+
+  <!-- T&C Modal -->
+  <div id="tos-modal" class="tosm-overlay">
+    <div class="tosm-dialog">
+      <div class="tosm-header">
+        <span class="tosm-title">Independent Contractor Agreement — Key Terms</span>
+        <button class="tosm-close" id="tosm-close">&times;</button>
+      </div>
+      <div class="tosm-body">
+        <div class="tosm-section">
+          <div class="tosm-clause-num">§ 3.1 — Employment Status</div>
+          <div class="tosm-clause">You are an <strong>independent contractor, not an employee</strong>. QuickBite assumes no responsibility for minimum wage guarantees, sick pay, holiday entitlement, or employment benefits of any kind.</div>
+        </div>
+        <div class="tosm-section">
+          <div class="tosm-clause-num">§ 7.4 — Account Deactivation</div>
+          <div class="tosm-clause">QuickBite may <strong>deactivate your account at any time, without prior notice or stated cause</strong>, based on automated performance review. This decision is final and not subject to human appeal or review.</div>
+        </div>
+        <div class="tosm-section">
+          <div class="tosm-clause-num">§ 9.2 — Performance Score</div>
+          <div class="tosm-clause">Your performance score is <strong>determined by proprietary algorithms</strong>. The specific criteria, weightings, and thresholds are confidential business information and may be modified at any time without notice.</div>
+        </div>
+        <div class="tosm-section">
+          <div class="tosm-clause-num">§ 12.1 — Order Allocation</div>
+          <div class="tosm-clause">Acceptance rate, delivery time, and customer ratings <strong>affect the orders you are offered</strong>. Couriers who frequently decline orders may receive fewer assignments or lower-value opportunities at the platform's sole discretion.</div>
+        </div>
+        <div class="tosm-section">
+          <div class="tosm-clause-num">§ 15.3 — Platform Changes</div>
+          <div class="tosm-clause">QuickBite may modify <strong>platform fees, pricing structures, and service terms unilaterally</strong> and without advance notice. Continued use of the platform constitutes acceptance of any revised terms.</div>
+        </div>
+      </div>
+      <button class="tosm-cta" id="tosm-accept">I understand — close</button>
+    </div>
+  </div>
+
+  <!-- Screen flash vignette -->
+  <div id="screen-flash" class="screen-flash"></div>
 
   <script src="game.js"></script>
 </body>

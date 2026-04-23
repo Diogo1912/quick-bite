@@ -192,6 +192,8 @@ const Loading={
 const ExtNotif={
   templates:{
     day1_start:{app:'WhatsApp',icon:'#25D366',letter:'W',title:'Mom',body:'Good luck on your first day! Be safe out there.'},
+    angry_customer_1:{app:'QuickBite',icon:'#FF3B30',letter:'Q',title:'Customer message',body:'WHERE IS MY ORDER?? It\'s been 30 minutes already!!'},
+    angry_customer_2:{app:'QuickBite',icon:'#FF3B30',letter:'Q',title:'Rating alert',body:'New feedback received: ★☆☆☆☆ "Extremely late, no communication."'},
     low_earnings:{app:'ING Banking',icon:'#FF6200',letter:'ING',title:'Account update',body:'Current balance: \u20ac47.23'},
     low_earnings_2:{app:'ING Banking',icon:'#FF6200',letter:'ING',title:'Payment failed',body:'Direct debit could not be processed: insufficient funds.'},
     health_warn:{app:'Health',icon:'#FF2D55',letter:'H',title:'Activity alert',body:'You\'ve been cycling for 6+ hours. Consider taking a break.'},
@@ -219,12 +221,13 @@ const ExtNotif={
 const S={
   day:0,phase:'title',playerName:'Courier',vehicle:'bike',
   stats:{income:50,rating:50,wellbeing:65,autonomy:70},
+  statsAtDayStart:{income:50,rating:50,wellbeing:65,autonomy:70},
   earnings:0,deliveries:0,declined:0,acceptance:100,
   todayEarnings:0,dailyEarnings:[],
   history:[],orderLog:[],flags:{},ended:false,endingType:null,timer:null,
   gameTime:9*60+41,fillerIdx:0
 };
-function resetState(){Object.assign(S,{day:0,phase:'title',stats:{income:50,rating:50,wellbeing:65,autonomy:70},earnings:0,deliveries:0,declined:0,acceptance:100,todayEarnings:0,dailyEarnings:[],history:[],orderLog:[],flags:{},ended:false,endingType:null,timer:null,gameTime:9*60+41,fillerIdx:0});}
+function resetState(){Object.assign(S,{day:0,phase:'title',stats:{income:50,rating:50,wellbeing:65,autonomy:70},statsAtDayStart:{income:50,rating:50,wellbeing:65,autonomy:70},earnings:0,deliveries:0,declined:0,acceptance:100,todayEarnings:0,dailyEarnings:[],history:[],orderLog:[],flags:{},ended:false,endingType:null,timer:null,gameTime:9*60+41,fillerIdx:0});}
 
 // Filler orders pool
 const FILLERS=[
@@ -243,7 +246,37 @@ function getFillerOrder(){const o=FILLERS[S.fillerIdx%FILLERS.length];S.fillerId
 
 // Effects
 function applyCascades(){const p={income:0,rating:0,wellbeing:0,autonomy:0};if(S.stats.rating<40)p.income-=5;if(S.stats.wellbeing<30)p.autonomy-=5;if(S.stats.income<25){p.wellbeing-=5;p.autonomy-=5;}if(S.stats.autonomy<25)p.wellbeing-=3;return p;}
-function applyEffects(fx,fl){const casc=applyCascades(),mult=S.stats.wellbeing<30?1.5:1;for(const k of['income','rating','wellbeing','autonomy']){let d=fx[k]||0;if(d<0)d=Math.round(d*mult);S.stats[k]=Math.max(0,Math.min(100,S.stats[k]+d+(casc[k]||0)));}if(fl)Object.assign(S.flags,fl);}
+function applyEffects(fx,fl){
+  const prev={...S.stats};
+  const casc=applyCascades(),mult=S.stats.wellbeing<30?1.5:1;
+  for(const k of['income','rating','wellbeing','autonomy']){let d=fx[k]||0;if(d<0)d=Math.round(d*mult);S.stats[k]=Math.max(0,Math.min(100,S.stats[k]+d+(casc[k]||0)));}
+  if(fl)Object.assign(S.flags,fl);
+  // Screen flash for big drops
+  const redDrop=(['wellbeing','autonomy']).some(k=>prev[k]-S.stats[k]>=10);
+  const orangeDrop=!redDrop&&(['income','rating']).some(k=>prev[k]-S.stats[k]>=10);
+  if(redDrop)flashScreen('red');else if(orangeDrop)flashScreen('orange');
+  checkStatWarnings(prev);
+}
+function flashScreen(color){
+  const el=$('#screen-flash');if(!el)return;
+  el.className='screen-flash flash-'+color;
+  setTimeout(()=>{el.className='screen-flash';},950);
+}
+function checkStatWarnings(prev){
+  const msgs={wellbeing:"⚠ You're burning out — your wellbeing is critical.",autonomy:"⚠ Your autonomy is almost gone.",income:"⚠ Your earnings are critically low.",rating:"⚠ Your score is close to deactivation."};
+  for(const k of['wellbeing','autonomy','income','rating']){
+    if(prev[k]>30&&S.stats[k]<=30&&!S.flags['warned_'+k]){
+      S.flags['warned_'+k]=true;showStatWarnToast(msgs[k]);return;
+    }
+  }
+}
+function showStatWarnToast(msg){
+  const app=$('#app-main');if(!app)return;
+  const t=document.createElement('div');t.className='stat-warn-toast';
+  t.innerHTML=`<span class="swt-text">${msg}</span>`;
+  app.appendChild(t);setTimeout(()=>t.classList.add('on'),50);
+  setTimeout(()=>{t.classList.remove('on');setTimeout(()=>t.remove(),400);},3800);
+}
 function getEnding(){const s=S.stats;if(S.flags.switchedPlatform)return'walked';if(s.rating<20||s.income<=0||s.rating<=0||s.wellbeing<=0||s.autonomy<=0)return'deactivated';if(s.rating>55&&s.income>50&&s.wellbeing>40)return'thriving';return'surviving';}
 
 // ============================================================
@@ -329,6 +362,7 @@ const SHIFTS={
     shiftEnd:s=>({earned:s.flags.workedInStorm?9.80:(s.flags.selectiveInStorm?9.80:0),orders:s.flags.loggedOffStorm?0:1}),
     insight:{platformCase:'<strong>Why does QuickBite surge during bad weather?</strong>\n\nSurge pricing is supply-and-demand. Without it, orders go unfulfilled. Participation is voluntary. And without couriers in bad weather, vulnerable people lose access to meals.\n\n<span class="source">(Kellogg et al., 2020; Jarrahi et al., 2021)</span>',
       rawlsianLens:'<strong>Formal vs. Substantive Freedom</strong> <span class="source">(Rawls, 1999, pp. 176\u2013180)</span>\n\nIf declining orders degrades your score, which degrades future earnings \u2014 is logging off during a storm really a free choice? The freedom is real on paper. The cost of using it is real in practice.'},
+    midDeliveryNotifs:[{key:'angry_customer_1',delay:3500},{key:'angry_customer_2',delay:7000}],
     extNotifs:[{key:'storm_weather',delay:1000},{key:'rent_due',delay:12000}]},
   4:{title:'The Warning',sub:'Thursday',weather:'overcast',mechanism:'Automated Deactivation',fillerCount:2,
     appNotif:()=>{if(S.stats.rating<30)return`${S.playerName}, your account needs attention. Improve soon to keep delivering. This review is automated and final.`;if(S.stats.rating<45)return`Heads-up ${S.playerName}! Your metrics are below community standards. Let\u2019s get those numbers up!`;return`Pro tip ${S.playerName}: Consistent performance unlocks the best orders!`;},
@@ -409,10 +443,24 @@ const PG={
 // ============================================================
 function show(id){$$('.screen').forEach(s=>s.classList.remove('active'));$(`#${id}`).classList.add('active');if(id==='scr-game'){switchTab('map');}}
 
+function showFramingCard(cb){
+  const el=document.createElement('div');el.className='framing-card';
+  el.innerHTML=`<div class="fc-inner"><div class="fc-text">You are a gig courier.<br>Your income, rating, and freedom<br>are controlled by an algorithm<br><em>you cannot see.</em></div><div class="fc-hint">Tap to continue</div></div>`;
+  document.body.appendChild(el);
+  let done=false;
+  const dismiss=()=>{if(done)return;done=true;el.classList.add('fade-out');setTimeout(()=>{el.remove();cb();},600);};
+  el.addEventListener('click',dismiss);
+  setTimeout(dismiss,4000);
+}
 function initTitle(){
   const check=$('#tos-check'),btnNext=$('#btn-next'),btnStart=$('#btn-start');
   check.addEventListener('change',()=>{btnNext.disabled=!check.checked;});
   btnNext.onclick=()=>{$('#ob-step1').classList.remove('active');$('#ob-step2').classList.add('active');setTimeout(()=>$('#ob-name').focus(),300);};
+  // T&C modal
+  $$('.tos-link').forEach(a=>{a.onclick=e=>{e.preventDefault();$('#tos-modal').classList.add('active');};});
+  const closeTos=()=>$('#tos-modal').classList.remove('active');
+  $('#tosm-close').onclick=closeTos;$('#tosm-accept').onclick=closeTos;
+  $('#tos-modal').onclick=e=>{if(e.target===$('#tos-modal'))closeTos();};
   // Vehicle selection
   $$('.ob-veh').forEach(v=>v.onclick=()=>{$$('.ob-veh').forEach(b=>b.classList.remove('active'));v.classList.add('active');S.vehicle=v.dataset.v;});
   btnStart.onclick=()=>{
@@ -420,7 +468,7 @@ function initTitle(){
     S.playerName=name||'Courier';
     SFX.init();SFX.play('accept');
     S.day=1;S.gameTime=9*60+41;
-    Loading.show(1,4500,()=>{show('scr-game');updateStats();updateClock(0);CityMap.init($('#map-canvas'));SFX.startCity();startDay(1);});
+    Loading.show(1,4500,()=>{show('scr-game');updateStats();updateClock(0);CityMap.init($('#map-canvas'));SFX.startCity();showFramingCard(()=>startDay(1));});
   };
 }
 
@@ -428,7 +476,7 @@ function initTitle(){
 // DAY FLOW
 // ============================================================
 function startDay(d){
-  S.day=d;S.todayEarnings=0;
+  S.day=d;S.todayEarnings=0;S.statsAtDayStart={...S.stats};
   const shift=SHIFTS[d],phone=$('#phone');
   phone.dataset.weather=shift.weather||'clear';
   const rain=phone.querySelector('.rain-overlay');if(rain)rain.remove();
@@ -498,6 +546,7 @@ function startFillerDelivery(card,order,onComplete){
 
 function startDelivery(d,card){
   const shift=SHIFTS[d],app=$('#app-main');card.remove();
+  if(shift.midDeliveryNotifs)shift.midDeliveryNotifs.forEach(n=>setTimeout(()=>{const tpl=ExtNotif.templates[n.key];if(tpl)ExtNotif.show(tpl);},n.delay));
   const del=document.createElement('div');del.className='delivery-screen';
   del.innerHTML=`<div class="del-status">Delivering...</div><div class="del-card"><div class="del-route"><div class="del-dot del-from"></div><div class="del-line"><div class="del-progress"></div><div class="del-rider"></div></div><div class="del-dot del-to"></div></div><div class="del-info"><span>${shift.order.restaurant}</span><span>Customer</span></div><div class="del-bar"><div class="del-bar-fill"></div></div></div>`;
   app.appendChild(del);
@@ -557,8 +606,21 @@ function handleChoice(d,delScreen,choices,idx,desktop){
 
 function showShiftEnd(d){
   const shift=SHIFTS[d],app=$('#app-main');app.innerHTML='';const st=$('#side-tip');if(st)st.innerHTML='';S.dailyEarnings[d-1]=S.todayEarnings;
-  const s=document.createElement('div');s.innerHTML=`<div class="ss-title-text">Shift Complete</div><div class="ss-day-text">${shift.sub} \u2014 ${shift.title}</div><div class="ss-grid"><div class="ss-stat"><div class="ss-stat-val">\u20ac${S.earnings.toFixed(2)}</div><div class="ss-stat-lbl">Total</div></div><div class="ss-stat"><div class="ss-stat-val">${(S.stats.rating/10).toFixed(1)}</div><div class="ss-stat-lbl">Rating</div></div><div class="ss-stat"><div class="ss-stat-val">${S.acceptance}%</div><div class="ss-stat-lbl">Accept</div></div><div class="ss-stat"><div class="ss-stat-val">${S.deliveries}</div><div class="ss-stat-lbl">Deliveries</div></div></div><button class="ss-insight-btn">Why did the algorithm do this?</button><div class="ss-insight"><div class="ins-section ins-plat"><h4>The Platform's Case</h4><div>${shift.insight.platformCase}</div></div><div class="ins-section ins-rawl"><h4>The Rawlsian Lens</h4><div>${shift.insight.rawlsianLens}</div></div></div><button class="ss-next">${d<5?'Continue to '+SHIFTS[d+1].sub:'See your ending'}</button>`;
+  const prev=S.statsAtDayStart||{income:50,rating:50,wellbeing:65,autonomy:70};
+  const statMeta=[{k:'wellbeing',lbl:'Wellbeing'},{k:'autonomy',lbl:'Autonomy'},{k:'income',lbl:'Income'},{k:'rating',lbl:'Rating'}];
+  const deltaRows=statMeta.map(({k,lbl})=>{
+    const now=S.stats[k],was=prev[k],diff=now-was;
+    const arrow=diff>0?'\u25b2':diff<0?'\u25bc':'\u2014';
+    const cls=diff>0?'pos':diff<0?'neg':'neu';
+    const label=diff!==0?`${arrow} ${Math.abs(diff)}`:`${arrow}`;
+    return `<div class="ssc-row" data-stat="${k}"><div class="ssc-label">${lbl}</div><div class="ssc-bar-wrap"><div class="ssc-bar-fill" style="width:0%" data-target="${now}"></div></div><div class="ssc-right"><span class="ssc-val">${now}</span><span class="ssc-delta ${cls}">${label}</span></div></div>`;
+  }).join('');
+  const s=document.createElement('div');s.innerHTML=`<div class="ss-title-text">Shift Complete</div><div class="ss-day-text">${shift.sub} \u2014 ${shift.title}</div><div class="ss-grid"><div class="ss-stat"><div class="ss-stat-val">\u20ac${S.earnings.toFixed(2)}</div><div class="ss-stat-lbl">Total</div></div><div class="ss-stat"><div class="ss-stat-val">${(S.stats.rating/10).toFixed(1)}</div><div class="ss-stat-lbl">Rating</div></div><div class="ss-stat"><div class="ss-stat-val">${S.acceptance}%</div><div class="ss-stat-lbl">Accept</div></div><div class="ss-stat"><div class="ss-stat-val">${S.deliveries}</div><div class="ss-stat-lbl">Deliveries</div></div></div><div class="ss-changes"><div class="ssc-title">Shift impact</div>${deltaRows}</div><button class="ss-insight-btn">Why did the algorithm do this?</button><div class="ss-insight"><div class="ins-section ins-plat"><h4>The Platform's Case</h4><div>${shift.insight.platformCase}</div></div><div class="ins-section ins-rawl"><h4>The Rawlsian Lens</h4><div>${shift.insight.rawlsianLens}</div></div></div><button class="ss-next">${d<5?'Continue to '+SHIFTS[d+1].sub:'See your ending'}</button>`;
   app.appendChild(s);
+  // Animate bars after paint
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    s.querySelectorAll('.ssc-bar-fill').forEach(bar=>{bar.style.width=bar.dataset.target+'%';});
+  }));
   s.querySelector('.ss-insight-btn').onclick=function(){const ins=s.querySelector('.ss-insight');ins.classList.toggle('open');this.textContent=ins.classList.contains('open')?'Close insight':'Why did the algorithm do this?';};
   s.querySelector('.ss-next').onclick=()=>{SFX.stopRain();if(d<5)Loading.show(d+1,4500,()=>startDay(d+1));else showEndScreen();};
 }
